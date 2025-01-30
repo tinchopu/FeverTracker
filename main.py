@@ -47,7 +47,7 @@ def main():
     if st.button("Add Temperature"):
         df = add_temperature(temperature, timestamp, df)
         st.success("Temperature reading added successfully!")
-        st.experimental_rerun()
+        st.rerun()
 
     # Statistics section
     st.subheader("Statistics")
