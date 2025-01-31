@@ -86,7 +86,10 @@ def main():
 
     # Display raw data
     if st.checkbox("Show raw data"):
-        st.dataframe(df.sort_values('timestamp', ascending=False))
+        # Convert UTC to local time for display
+        df_display = df.copy()
+        df_display['timestamp'] = df_display['timestamp'].dt.tz_convert(datetime.now().astimezone().tzinfo)
+        st.dataframe(df_display.sort_values('timestamp', ascending=False))
 
 if __name__ == "__main__":
     main()

@@ -3,6 +3,7 @@ from datetime import datetime
 import streamlit as st
 import plotly.graph_objects as go
 from typing import Tuple
+import datetime as dt
 
 # ISO format with timezone for consistent datetime handling
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S%z"
@@ -43,8 +44,12 @@ def create_temperature_chart(df: pd.DataFrame) -> go.Figure:
     fig = go.Figure()
     
     if len(df) > 0:
+        # Convert UTC timestamps to local time for display
+        df_local = df.copy()
+        df_local['timestamp'] = df_local['timestamp'].dt.tz_convert(dt.datetime.now().astimezone().tzinfo)
+        
         fig.add_trace(go.Scatter(
-            x=df['timestamp'],
+            x=df_local['timestamp'],
             y=df['temperature'],
             mode='lines+markers',
             name='Temperature',
