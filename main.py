@@ -10,20 +10,26 @@ def main():
         page_icon="🌡️",
         layout="wide"
     )
-    
+
     apply_custom_style()
-    
+
     st.title("🌡️ Temperature Tracker")
     st.markdown("Track your body temperature over time")
+
+    # Initialize session state for timestamp
+    if 'selected_date' not in st.session_state:
+        st.session_state.selected_date = datetime.now().date()
+    if 'selected_time' not in st.session_state:
+        st.session_state.selected_time = datetime.now().time()
 
     # Load existing data
     df = load_data()
 
     # Input section
     st.subheader("Add New Temperature Reading")
-    
+
     col1, col2 = st.columns([2, 1])
-    
+
     with col1:
         temperature = st.number_input(
             "Temperature (°C)",
@@ -33,14 +39,21 @@ def main():
             step=0.1,
             format="%.1f"
         )
-    
+
     with col2:
         use_current_time = st.checkbox("Use current time", value=True)
-        
+
     if not use_current_time:
-        date = st.date_input("Date", datetime.now())
-        time = st.time_input("Time", datetime.now().time())
-        timestamp = datetime.combine(date, time)
+        selected_date = st.date_input("Date", st.session_state.selected_date)
+        selected_time = st.time_input("Time", st.session_state.selected_time)
+
+        # Update session state only when input changes
+        if selected_date != st.session_state.selected_date:
+            st.session_state.selected_date = selected_date
+        if selected_time != st.session_state.selected_time:
+            st.session_state.selected_time = selected_time
+
+        timestamp = datetime.combine(st.session_state.selected_date, st.session_state.selected_time)
     else:
         timestamp = datetime.now(pytz.UTC)
 
@@ -52,7 +65,7 @@ def main():
     # Statistics section
     st.subheader("Statistics")
     avg_temp, min_temp, max_temp = get_statistics(df)
-    
+
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Average", f"{avg_temp}°C")
