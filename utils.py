@@ -12,9 +12,11 @@ def load_data() -> pd.DataFrame:
     try:
         df = pd.read_csv('temperature_data.csv')
         df['timestamp'] = pd.to_datetime(df['timestamp'], format=DATETIME_FORMAT)
+        if 'medication' not in df.columns:
+            df['medication'] = ''
         return df
     except FileNotFoundError:
-        return pd.DataFrame(columns=['timestamp', 'temperature'])
+        return pd.DataFrame(columns=['timestamp', 'temperature', 'medication'])
 
 def save_data(df: pd.DataFrame) -> None:
     # Ensure timestamps are formatted consistently and sorted
@@ -23,10 +25,11 @@ def save_data(df: pd.DataFrame) -> None:
     df_copy['timestamp'] = df_copy['timestamp'].dt.strftime(DATETIME_FORMAT)
     df_copy.to_csv('temperature_data.csv', index=False)
 
-def add_temperature(temp: float, timestamp: datetime, df: pd.DataFrame) -> pd.DataFrame:
+def add_temperature(temp: float, timestamp: datetime, medication: str, df: pd.DataFrame) -> pd.DataFrame:
     new_data = pd.DataFrame({
         'timestamp': [timestamp],
-        'temperature': [temp]
+        'temperature': [temp],
+        'medication': [medication]
     })
     df = pd.concat([df, new_data], ignore_index=True)
     save_data(df)
@@ -49,13 +52,23 @@ def create_temperature_chart(df: pd.DataFrame) -> go.Figure:
         df_local = df.copy()
         df_local['timestamp'] = df_local['timestamp'].dt.tz_convert(dt.datetime.now().astimezone().tzinfo)
         
+        # Create hover text with medication info
+        hover_text = []
+        for _, row in df_local.iterrows():
+            text = f"Temperature: {row['temperature']}°C"
+            if row['medication']:
+                text += f"<br>Medication: {row['medication']}"
+            hover_text.append(text)
+
         fig.add_trace(go.Scatter(
             x=df_local['timestamp'],
             y=df['temperature'],
             mode='lines+markers',
             name='Temperature',
             line=dict(color='#3498db', width=2),
-            marker=dict(size=8, color='#2980b9')
+            marker=dict(size=8, color='#2980b9'),
+            hovertext=hover_text,
+            hoverinfo='text'
         ))
 
         fig.update_layout(

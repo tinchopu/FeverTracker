@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime
 import pytz
-from utils import load_data, add_temperature, get_statistics, create_temperature_chart
+from utils import load_data, add_temperature, create_temperature_chart
 from style import apply_custom_style
 
 def main():
@@ -28,7 +28,7 @@ def main():
     # Input section
     st.subheader("Add New Temperature Reading")
 
-    col1, col2 = st.columns([2, 1])
+    col1, col2, col3 = st.columns([2, 2, 1])
 
     with col1:
         temperature = st.number_input(
@@ -41,6 +41,9 @@ def main():
         )
 
     with col2:
+        medication = st.text_input("Medication (if any)")
+
+    with col3:
         use_current_time = st.checkbox("Use current time", value=True)
 
     if not use_current_time:
@@ -60,21 +63,9 @@ def main():
         timestamp = datetime.now(pytz.UTC)
 
     if st.button("Add Temperature"):
-        df = add_temperature(temperature, timestamp, df)
+        df = add_temperature(temperature, timestamp, medication, df)
         st.success("Temperature reading added successfully!")
         st.rerun()
-
-    # Statistics section
-    st.subheader("Statistics")
-    avg_temp, min_temp, max_temp = get_statistics(df)
-
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Average", f"{avg_temp}°C")
-    with col2:
-        st.metric("Minimum", f"{min_temp}°C")
-    with col3:
-        st.metric("Maximum", f"{max_temp}°C")
 
     # Chart section
     st.subheader("Temperature History")
