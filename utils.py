@@ -7,7 +7,7 @@ from typing import Tuple
 def load_data() -> pd.DataFrame:
     try:
         df = pd.read_csv('temperature_data.csv')
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
         return df
     except FileNotFoundError:
         return pd.DataFrame(columns=['timestamp', 'temperature'])
