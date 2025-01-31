@@ -4,16 +4,22 @@ import streamlit as st
 import plotly.graph_objects as go
 from typing import Tuple
 
+# ISO format with timezone for consistent datetime handling
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S%z"
+
 def load_data() -> pd.DataFrame:
     try:
         df = pd.read_csv('temperature_data.csv')
-        df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
+        df['timestamp'] = pd.to_datetime(df['timestamp'], format=DATETIME_FORMAT)
         return df
     except FileNotFoundError:
         return pd.DataFrame(columns=['timestamp', 'temperature'])
 
 def save_data(df: pd.DataFrame) -> None:
-    df.to_csv('temperature_data.csv', index=False)
+    # Ensure timestamps are formatted consistently
+    df_copy = df.copy()
+    df_copy['timestamp'] = df_copy['timestamp'].dt.strftime(DATETIME_FORMAT)
+    df_copy.to_csv('temperature_data.csv', index=False)
 
 def add_temperature(temp: float, timestamp: datetime, df: pd.DataFrame) -> pd.DataFrame:
     new_data = pd.DataFrame({

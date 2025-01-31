@@ -53,7 +53,9 @@ def main():
         if selected_time != st.session_state.selected_time:
             st.session_state.selected_time = selected_time
 
-        timestamp = datetime.combine(st.session_state.selected_date, st.session_state.selected_time)
+        # Convert local time to UTC
+        local_dt = datetime.combine(st.session_state.selected_date, st.session_state.selected_time)
+        timestamp = local_dt.astimezone(pytz.UTC)
     else:
         timestamp = datetime.now(pytz.UTC)
 
