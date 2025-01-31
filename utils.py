@@ -17,8 +17,9 @@ def load_data() -> pd.DataFrame:
         return pd.DataFrame(columns=['timestamp', 'temperature'])
 
 def save_data(df: pd.DataFrame) -> None:
-    # Ensure timestamps are formatted consistently
+    # Ensure timestamps are formatted consistently and sorted
     df_copy = df.copy()
+    df_copy = df_copy.sort_values('timestamp', ascending=True)
     df_copy['timestamp'] = df_copy['timestamp'].dt.strftime(DATETIME_FORMAT)
     df_copy.to_csv('temperature_data.csv', index=False)
 
