@@ -56,9 +56,12 @@ def create_temperature_chart(df: pd.DataFrame) -> go.Figure:
         hover_text = []
         for _, row in df_local.iterrows():
             text = f"Temperature: {row['temperature']}°C"
-            if row['medication']:
+            if pd.notna(row['medication']) and row['medication']:
                 text += f"<br>Medication: {row['medication']}"
             hover_text.append(text)
+
+        # Create marker colors based on medication
+        marker_colors = ['#ff0000' if pd.notna(med) and med else '#2980b9' for med in df['medication']]
 
         fig.add_trace(go.Scatter(
             x=df_local['timestamp'],
@@ -66,7 +69,7 @@ def create_temperature_chart(df: pd.DataFrame) -> go.Figure:
             mode='lines+markers',
             name='Temperature',
             line=dict(color='#3498db', width=2),
-            marker=dict(size=8, color='#2980b9'),
+            marker=dict(size=8, color=marker_colors),
             hovertext=hover_text,
             hoverinfo='text'
         ))
