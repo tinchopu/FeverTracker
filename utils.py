@@ -28,7 +28,7 @@ def save_data(df: pd.DataFrame) -> None:
 def add_temperature(temp: float, timestamp: datetime, medication: str, df: pd.DataFrame) -> pd.DataFrame:
     new_data = pd.DataFrame({
         'timestamp': [timestamp],
-        'temperature': [temp],
+        'temperature': [round(temp, 1)],  # Round to 1 decimal place
         'medication': [medication]
     })
     df = pd.concat([df, new_data], ignore_index=True)
