@@ -9,13 +9,48 @@
 - Error message: "error: Failed to spawn: `streamlit`"
 
 **Root Cause:**
-The service user doesn't have access to the `uv` executable or the Python virtual environment.
+The service user doesn't have access to the `uv` executable or the Python virtual environment, or there are permission issues with the user's home directory or cache.
 
-**Solution:**
-The deployment script has been updated to:
-1. Install `uv` specifically for the service user
-2. Set proper PATH environment variable in the service file
-3. Use the full path to the `uv` executable
+**Quick Fix:**
+Run the automated fix script:
+```bash
+sudo ./fix_service_permissions.sh
+```
+
+**Manual Solution:**
+If the automated script doesn't work, follow these steps:
+
+1. **Stop the service:**
+   ```bash
+   sudo systemctl stop fever_tracker.service
+   ```
+
+2. **Fix user directories:**
+   ```bash
+   sudo mkdir -p /home/fevertracker_user/.local/bin
+   sudo mkdir -p /home/fevertracker_user/.cache
+   sudo chown -R fevertracker_user:fevertracker_user /home/fevertracker_user
+   sudo chmod -R 755 /home/fevertracker_user
+   ```
+
+3. **Reinstall uv for the service user:**
+   ```bash
+   sudo rm -f /home/fevertracker_user/.local/bin/uv
+   sudo -u fevertracker_user bash -c 'export HOME="/home/fevertracker_user" && curl -LsSf https://astral.sh/uv/install.sh | sh'
+   sudo chmod +x /home/fevertracker_user/.local/bin/uv
+   ```
+
+4. **Reinstall dependencies:**
+   ```bash
+   cd /opt/fevertracker
+   sudo rm -rf .venv
+   sudo -u fevertracker_user HOME="/home/fevertracker_user" PATH="/home/fevertracker_user/.local/bin:$PATH" /home/fevertracker_user/.local/bin/uv sync
+   ```
+
+5. **Restart the service:**
+   ```bash
+   sudo systemctl start fever_tracker.service
+   ```
 
 ### 2. Service File Issues
 
