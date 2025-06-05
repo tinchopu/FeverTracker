@@ -28,6 +28,15 @@ def load_config() -> dict:
         st.error(f"Error loading configuration: {str(e)}")
         raise
 
+def should_show_csv_migration() -> bool:
+    """Check if CSV migration section should be shown based on config."""
+    try:
+        config = load_config()
+        return config.get('ui', {}).get('show_csv_migration', False)
+    except Exception:
+        # If there's any error loading config, default to not showing migration
+        return False
+
 def get_mongodb_collection() -> Collection:
     """Get MongoDB collection for temperature data."""
     try:
