@@ -22,7 +22,8 @@ A web-based application built with Streamlit for tracking and visualizing body t
 ## Requirements
 
 - Python 3.11 or higher
-- Dependencies:
+- [uv](https://docs.astral.sh/uv/) - Fast Python package installer and resolver
+- Dependencies are managed via `pyproject.toml`:
   - streamlit >= 1.41.1
   - pandas >= 2.2.3
   - plotly >= 6.0.0
@@ -30,25 +31,65 @@ A web-based application built with Streamlit for tracking and visualizing body t
 
 ## Installation
 
+### Prerequisites
+First, install `uv` if you haven't already:
+```bash
+# On macOS and Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# On Windows
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Or via pip
+pip install uv
+```
+
+### Project Setup
 1. Clone this repository:
 ```bash
 git clone https://github.com/yourusername/FeverTracker.git
 cd FeverTracker
 ```
 
-2. Install dependencies:
+2. Initialize the project (this will install all dependencies):
 ```bash
-pip install -r requirements.txt
+make init
 ```
 
 ## Usage
 
-1. Start the application:
+### Quick Start
 ```bash
-streamlit run main.py
+make run
 ```
 
-2. Open your web browser and navigate to the provided local URL (typically http://localhost:8501)
+### Available Make Commands
+Run `make help` to see all available commands:
+
+- `make run` - Install dependencies and start the application
+- `make install` - Install dependencies using uv
+- `make test` - Run application tests to verify everything works
+- `make dev` - Install development dependencies
+- `make clean` - Clean up temporary files and caches
+- `make update` - Update all dependencies to latest versions
+- `make info` - Show project and environment information
+- `make status` - Show current environment status
+- `make reset` - Reset the environment (clean + fresh install)
+
+### Manual Usage
+If you prefer not to use the Makefile:
+
+1. Install dependencies:
+```bash
+uv sync
+```
+
+2. Start the application:
+```bash
+uv run streamlit run main.py
+```
+
+3. Open your web browser and navigate to the provided local URL (typically http://localhost:8501)
 
 3. To add a temperature reading:
    - Enter the temperature value in Celsius
@@ -63,6 +104,10 @@ streamlit run main.py
 - `main.py`: Main application file with Streamlit interface
 - `utils.py`: Utility functions for data handling and chart creation
 - `style.py`: Custom CSS styling for the web interface
+- `pyproject.toml`: Project configuration and dependencies
+- `uv.lock`: Lock file with exact dependency versions
+- `Makefile`: Automation scripts for common development tasks
+- `test_app.py`: Test script to verify application functionality
 - `temperature_data.csv`: Data storage file for temperature readings
 
 ## Features in Detail
