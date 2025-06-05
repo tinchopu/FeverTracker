@@ -49,15 +49,13 @@ sudo chown -R "$SERVICE_USER:$SERVICE_USER" "$APP_DIR"
 sudo chmod -R 755 "$APP_DIR"
 echo -e "${GREEN}✓ Ownership and permissions set${NC}"
 
-echo -e "${BLUE}Step 5: Installing uv (if not already installed)${NC}"
-if command -v uv &> /dev/null; then
-    echo -e "${YELLOW}uv is already installed, skipping installation${NC}"
-else
-    echo -e "${YELLOW}Installing uv...${NC}"
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    source $HOME/.cargo/env
-    echo -e "${GREEN}✓ uv installed successfully${NC}"
-fi
+echo -e "${BLUE}Step 5: Installing uv for service user${NC}"
+# Install uv for the service user
+sudo -u "$SERVICE_USER" bash -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
+# Ensure the .local/bin directory exists and has proper permissions
+sudo mkdir -p "/home/$SERVICE_USER/.local/bin"
+sudo chown -R "$SERVICE_USER:$SERVICE_USER" "/home/$SERVICE_USER/.local"
+echo -e "${GREEN}✓ uv installed for service user${NC}"
 
 echo -e "${BLUE}Step 6: Installing Python dependencies${NC}"
 cd "$APP_DIR"
@@ -67,7 +65,7 @@ sudo chown -R "$SERVICE_USER:$SERVICE_USER" "/home/$SERVICE_USER"
 sudo chmod -R 755 "/home/$SERVICE_USER"
 
 # Install dependencies with proper environment
-sudo -u "$SERVICE_USER" HOME="/home/$SERVICE_USER" uv sync
+sudo -u "$SERVICE_USER" HOME="/home/$SERVICE_USER" PATH="/home/$SERVICE_USER/.local/bin:$PATH" /home/$SERVICE_USER/.local/bin/uv sync
 echo -e "${GREEN}✓ Dependencies installed${NC}"
 
 echo -e "${BLUE}Step 7: Installing systemd service${NC}"

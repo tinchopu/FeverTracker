@@ -8,11 +8,12 @@ Group=fevertracker_user
 WorkingDirectory=/opt/fevertracker
 Environment=HOME=/home/fevertracker_user
 Environment=USER=fevertracker_user
-ExecStart=/usr/bin/uv run streamlit run main.py --server.port 8501 --server.headless true
+Environment=PATH=/home/fevertracker_user/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/fevertracker_user/.local/bin/uv run streamlit run main.py --server.port 8501 --server.headless true
 Restart=always
 RestartSec=10
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=journal
+StandardError=journal
 SyslogIdentifier=fever_tracker
 
 [Install]
