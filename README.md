@@ -21,12 +21,13 @@ A web-based application built with Streamlit for tracking and visualizing body t
 
 ## Requirements
 
-- Python 3.11 or higher
+- Python 3.13 or higher
 - [uv](https://docs.astral.sh/uv/) - Fast Python package installer and resolver
 - Dependencies are managed via `pyproject.toml`:
   - streamlit >= 1.41.1
   - pandas >= 2.2.3
   - plotly >= 6.0.0
+  - pymongo >= 4.6.0
   - pytz >= 2024.2
 
 ## Installation
@@ -47,7 +48,7 @@ pip install uv
 ### Project Setup
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/FeverTracker.git
+git clone https://github.com/tinchopu/FeverTracker.git
 cd FeverTracker
 ```
 
