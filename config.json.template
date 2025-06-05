@@ -1,0 +1,7 @@
+{
+  "mongodb": {
+    "uri": "mongodb://localhost:27017",
+    "database_name": "your_database_name",
+    "collection_name": "your_collection_name"
+  }
+}

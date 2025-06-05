@@ -189,5 +189,8 @@ Desktop.ini
 # *.xlsx
 # *.db
 
+# Configuration files with sensitive information
+config.json
+
 # Generated files
 generated-*

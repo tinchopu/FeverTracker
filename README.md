@@ -51,7 +51,16 @@ git clone https://github.com/yourusername/FeverTracker.git
 cd FeverTracker
 ```
 
-2. Initialize the project (this will install all dependencies):
+2. Set up configuration:
+```bash
+# Copy the template configuration file
+cp config.json.template config.json
+
+# Edit config.json with your MongoDB connection details
+# Update the uri, database_name, and collection_name as needed
+```
+
+3. Initialize the project (this will install all dependencies):
 ```bash
 make init
 ```
@@ -127,11 +136,35 @@ uv run streamlit run main.py
 - Real-time calculation of key metrics
 - Clear presentation of average, minimum, and maximum temperatures
 
+## Configuration
+
+The application uses a `config.json` file to store MongoDB connection details. This file is not tracked in version control for security reasons.
+
+### Configuration File Format
+```json
+{
+  "mongodb": {
+    "uri": "mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority",
+    "database_name": "fever_tracker_db",
+    "collection_name": "temperatures"
+  }
+}
+```
+
+### Environment Variable Override
+You can also set the MongoDB URI using the `MONGODB_URI` environment variable, which will override the value in the configuration file:
+```bash
+export MONGODB_URI="mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority"
+```
+
 ## Data Storage
 
-Temperature readings are stored in a CSV file (`temperature_data.csv`) with the following format:
+Temperature readings are stored in MongoDB with the following document structure:
 - timestamp: Date and time of the reading
 - temperature: Temperature value in Celsius
+- medication: Optional medication information
+
+Legacy CSV support is maintained for migration purposes.
 
 ## Styling
 

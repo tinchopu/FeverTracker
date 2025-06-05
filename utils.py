@@ -5,23 +5,43 @@ import plotly.graph_objects as go
 from typing import Tuple
 import datetime as dt
 import os
+import json
 from pymongo import MongoClient
 from pymongo.collection import Collection
-
-# MongoDB configuration
-MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb+srv://anton:WowL1790PAXLvGXJ@cluster0.dl0x4r4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
-DATABASE_NAME = 'fever_tracker_db'
-COLLECTION_NAME = 'temperatures'
 
 # ISO format with timezone for consistent datetime handling
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S%z"
 
+def load_config() -> dict:
+    """Load configuration from config.json file."""
+    try:
+        with open('config.json', 'r') as config_file:
+            config = json.load(config_file)
+        return config
+    except FileNotFoundError:
+        st.error("Configuration file 'config.json' not found. Please create it with MongoDB connection details.")
+        raise
+    except json.JSONDecodeError as e:
+        st.error(f"Error parsing configuration file: {str(e)}")
+        raise
+    except Exception as e:
+        st.error(f"Error loading configuration: {str(e)}")
+        raise
+
 def get_mongodb_collection() -> Collection:
     """Get MongoDB collection for temperature data."""
     try:
-        client = MongoClient(MONGODB_URI)
-        db = client[DATABASE_NAME]
-        collection = db[COLLECTION_NAME]
+        config = load_config()
+        mongodb_config = config['mongodb']
+        
+        # Allow environment variable to override config file
+        mongodb_uri = os.getenv('MONGODB_URI', mongodb_config['uri'])
+        database_name = mongodb_config['database_name']
+        collection_name = mongodb_config['collection_name']
+        
+        client = MongoClient(mongodb_uri)
+        db = client[database_name]
+        collection = db[collection_name]
         return collection
     except Exception as e:
         st.error(f"Failed to connect to MongoDB: {str(e)}")
