@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime
 import pytz
-from utils import load_data, add_temperature, create_temperature_chart
+from utils import load_data, add_temperature, create_temperature_chart, migrate_csv_to_mongodb
 from style import apply_custom_style
 
 def main():
@@ -15,6 +15,12 @@ def main():
 
     st.title("🌡️ Temperature Tracker")
     st.markdown("Track your body temperature over time")
+
+    # Migration section (one-time use)
+    with st.expander("🔄 Migrate CSV Data to MongoDB (One-time setup)"):
+        st.markdown("If you have existing temperature data in a CSV file, click the button below to migrate it to MongoDB.")
+        if st.button("Migrate CSV Data to MongoDB"):
+            migrate_csv_to_mongodb()
 
     # Initialize session state for timestamp
     if 'selected_date' not in st.session_state:
@@ -63,7 +69,7 @@ def main():
         timestamp = datetime.now(pytz.UTC)
 
     if st.button("Add Temperature"):
-        df = add_temperature(temperature, timestamp, medication, df)
+        add_temperature(temperature, timestamp, medication)
         st.success("Temperature reading added successfully!")
         st.rerun()
 
