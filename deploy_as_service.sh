@@ -23,9 +23,13 @@ SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
 
 echo -e "${BLUE}Step 1: Creating dedicated user '${SERVICE_USER}'${NC}"
 if id "$SERVICE_USER" &>/dev/null; then
-    echo -e "${YELLOW}User '${SERVICE_USER}' already exists, skipping creation${NC}"
+    echo -e "${YELLOW}User '${SERVICE_USER}' already exists, ensuring proper home directory setup${NC}"
+    # Ensure home directory exists for existing user
+    sudo mkdir -p "/home/$SERVICE_USER"
+    sudo chown "$SERVICE_USER:$SERVICE_USER" "/home/$SERVICE_USER"
 else
-    sudo useradd -r -s /bin/false "$SERVICE_USER"
+    # Create system user with home directory for uv cache
+    sudo useradd -r -m -s /bin/false "$SERVICE_USER"
     echo -e "${GREEN}✓ User '${SERVICE_USER}' created successfully${NC}"
 fi
 
@@ -57,7 +61,13 @@ fi
 
 echo -e "${BLUE}Step 6: Installing Python dependencies${NC}"
 cd "$APP_DIR"
-sudo -u "$SERVICE_USER" uv sync
+# Ensure the user's home directory and cache directories exist with proper permissions
+sudo mkdir -p "/home/$SERVICE_USER/.cache"
+sudo chown -R "$SERVICE_USER:$SERVICE_USER" "/home/$SERVICE_USER"
+sudo chmod -R 755 "/home/$SERVICE_USER"
+
+# Install dependencies with proper environment
+sudo -u "$SERVICE_USER" HOME="/home/$SERVICE_USER" uv sync
 echo -e "${GREEN}✓ Dependencies installed${NC}"
 
 echo -e "${BLUE}Step 7: Installing systemd service${NC}"

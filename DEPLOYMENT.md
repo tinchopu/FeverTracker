@@ -27,7 +27,7 @@ If you prefer to deploy manually, follow these steps:
 
 ### 1. Create a dedicated user
 ```bash
-sudo useradd -r -s /bin/false fevertracker_user
+sudo useradd -r -m -s /bin/false fevertracker_user
 ```
 
 ### 2. Create application directory and copy files
@@ -120,6 +120,29 @@ The service configuration is defined in `fever_tracker.service`:
 - **Permission errors**: Ensure `/opt/fevertracker` is owned by `fevertracker_user`
 - **Missing dependencies**: Run `sudo -u fevertracker_user uv sync` in `/opt/fevertracker`
 - **Port conflicts**: Check if port 8501 is already in use with `sudo netstat -tlnp | grep 8501`
+- **UV cache permission denied**: If you see `failed to create directory /home/fevertracker_user/.cache/uv: Permission denied`, ensure the user has a proper home directory:
+  ```bash
+  sudo mkdir -p /home/fevertracker_user/.cache
+  sudo chown -R fevertracker_user:fevertracker_user /home/fevertracker_user
+  sudo chmod -R 755 /home/fevertracker_user
+  ```
+
+### If you already have an existing user without home directory
+If you previously created the `fevertracker_user` without the `-m` flag and are getting permission errors:
+
+1. Remove the existing user:
+   ```bash
+   sudo userdel fevertracker_user
+   ```
+
+2. Re-run the deployment script, which will create the user properly with a home directory.
+
+Alternatively, you can fix the existing user:
+```bash
+sudo mkdir -p /home/fevertracker_user
+sudo chown fevertracker_user:fevertracker_user /home/fevertracker_user
+sudo chmod 755 /home/fevertracker_user
+```
 
 ### Updating the application
 To update the application:
